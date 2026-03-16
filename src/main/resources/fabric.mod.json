@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "tradememory",
+  "version": "${version}",
+  "name": "Trade Memory",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/tradememory/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.xiader45.tradememory.client.TradeMemoryClient"
+    ],
+    "main": [
+      "com.xiader45.tradememory.TradeMemory"
+    ]
+  },
+  "mixins": [
+    "tradememory.mixins.json",
+    {
+      "config": "tradememory.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
