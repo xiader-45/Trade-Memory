@@ -1,33 +1,32 @@
 package com.xiader45.tradememory.client;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.npc.villager.Villager;
-import org.jspecify.annotations.NonNull;
+import net.minecraft.client.gui.Click;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.text.Text;
 
-public class VillagerCardWidget extends AbstractWidget {
+public class VillagerCardWidget extends ClickableWidget {
     private final TradeMemoryScreen screen;
-    private Villager villager;
+    private VillagerEntity villager;
     private boolean isSelected;
 
-    public VillagerCardWidget(int x, int y, Villager villager, TradeMemoryScreen screen, boolean isSelected) {
+    public VillagerCardWidget(int x, int y, VillagerEntity villager, TradeMemoryScreen screen, boolean isSelected) {
         // Теперь размер виджета можно менять здесь, и житель сам подстроится под него!
-        super(x, y, 44, 44, Component.empty());
+        super(x, y, 44, 44, Text.empty());
         this.villager = villager;
         this.screen = screen;
         this.isSelected = isSelected;
     }
 
-    public void setVillager(Villager villager, boolean isSelected) {
+    public void setVillager(VillagerEntity villager, boolean isSelected) {
         this.villager = villager;
         this.isSelected = isSelected;
     }
 
     @Override
-    public void renderWidget(@NonNull GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         if (this.villager == null || !this.visible) return;
 
         context.enableScissor(screen.getGridX(), screen.getGridY(), screen.getGridX() + 179, screen.getGridY() + 179);
@@ -56,7 +55,7 @@ public class VillagerCardWidget extends AbstractWidget {
             int bottomY = this.getY() + this.height;    // Ноги упираются ровно в нижнюю границу квадрата
             int entitySize = this.height / 2;           // Масштаб моба - всегда ровно половина высоты виджета
 
-            net.minecraft.client.gui.screens.inventory.InventoryScreen.renderEntityInInventoryFollowsMouse(
+            net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity(
                     context,
                     this.getX(),
                     topY,
@@ -70,7 +69,7 @@ public class VillagerCardWidget extends AbstractWidget {
             );
         } catch (Exception | Error e) {
             // Если модель не смогла отрендериться, буква "V" тоже рисуется точно по центру любого квадрата
-            context.drawString(net.minecraft.client.Minecraft.getInstance().font,
+            context.drawText(net.minecraft.client.MinecraftClient.getInstance().textRenderer,
                     "V", this.getX() + (this.width / 2) - 3, this.getY() + (this.height / 2) - 4, 0xFFFFFFFF, false);
         }
 
@@ -78,9 +77,9 @@ public class VillagerCardWidget extends AbstractWidget {
     }
 
     @Override
-    public void onClick(@NonNull MouseButtonEvent click, boolean doubled) {
+    public void onClick(Click click, boolean doubled) {
         if (this.villager != null && this.visible) {
-            screen.selectVillager(villager.getUUID());
+            screen.selectVillager(villager.getUuid());
         }
     }
 
@@ -91,7 +90,7 @@ public class VillagerCardWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(@NonNull NarrationElementOutput builder) {
-        this.defaultButtonNarrationText(builder);
+    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+        this.appendDefaultNarrations(builder);
     }
 }

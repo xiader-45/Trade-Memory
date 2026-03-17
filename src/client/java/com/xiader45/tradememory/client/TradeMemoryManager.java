@@ -4,8 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ServerInfo;
+
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
@@ -21,7 +22,7 @@ public class TradeMemoryManager {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static UUID lastInteractedVillagerUuid = null;
-    public static net.minecraft.world.phys.Vec3 lastInteractedVillagerPos = null;
+    public static net.minecraft.util.math.Vec3d lastInteractedVillagerPos = null;
     public static UUID highlightedVillagerUuid = null;
 
     // Наша база данных, которая хранится в оперативной памяти во время игры
@@ -29,17 +30,17 @@ public class TradeMemoryManager {
 
     // Метод для получения названия файла в зависимости от того, где находится игрок
     private static Path getSaveFile() {
-        Minecraft client = Minecraft.getInstance();
+        MinecraftClient client = MinecraftClient.getInstance();
         String fileName = "unknown_world";
 
-        if (client.getSingleplayerServer() != null) {
+        if (client.getServer() != null) {
             // Если мы в одиночной игре или открыли мир для сети
-            fileName = "local_" + client.getSingleplayerServer().getWorldData().getLevelName();
+            fileName = "local_" + client.getServer().getSaveProperties().getLevelName();
         } else {
             // Если мы играем на внешнем сервере
-            ServerData serverInfo = client.getCurrentServer();
+            ServerInfo serverInfo = client.getCurrentServerEntry();
             if (serverInfo != null) {
-                fileName = "server_" + serverInfo.ip;
+                fileName = "server_" + serverInfo.address;
             }
         }
 

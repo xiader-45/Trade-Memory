@@ -1,26 +1,26 @@
 package com.xiader45.tradememory.client.mixin;
 
 import com.xiader45.tradememory.client.TradeMemoryManager;
-import net.minecraft.client.multiplayer.MultiPlayerGameMode;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.npc.villager.Villager;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(MultiPlayerGameMode.class)
+@Mixin(ClientPlayerInteractionManager.class)
 public class ClientPlayerInteractionManagerMixin {
 
-    @Inject(method = "interact", at = @At("HEAD"))
-    private void onInteractEntity(Player player, Entity entity, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        if (entity instanceof Villager) {
+    @Inject(method = "interactEntity", at = @At("HEAD"))
+    private void onInteractEntity(PlayerEntity player, Entity entity, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+        if (entity instanceof VillagerEntity) {
             // Запоминаем жителя для сохранения торгов при закрытии окна
-            TradeMemoryManager.lastInteractedVillagerUuid = entity.getUUID();
-            TradeMemoryManager.lastInteractedVillagerPos = entity.position();
+            TradeMemoryManager.lastInteractedVillagerUuid = entity.getUuid();
+            TradeMemoryManager.lastInteractedVillagerPos = entity.getEntityPos();
 
             // ИСПРАВЛЕНИЕ: Автоматически выключаем подсветку, как только мы нашли жителя и кликнули по нему!
             TradeMemoryManager.highlightedVillagerUuid = null;
